@@ -11,7 +11,7 @@ RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   && echo $LANG UTF-8 >> /etc/locale.gen \
   && locale-gen  \
   && apt-get install -y --no-install-recommends dash python-pip \
-  python-pil python-dev python-stdnum python-virtualenv virtualenv libyaml-dev freetds-dev \
+  python-pil python-dev python-virtualenv virtualenv libyaml-dev freetds-dev \
   libldap2-dev libsasl2-dev libpq-dev libmariadbd-dev libmysqlclient-dev sqlite sqlite3 \
   libsqlite3-dev libmagic-dev python-uno libreoffice-writer \
   npm libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \

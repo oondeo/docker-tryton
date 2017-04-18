@@ -1,7 +1,7 @@
 FROM debian:jessie
 ENV DEBIAN_FRONTEND=noninteractive LANG=es_ES.UTF-8 LANGUAGE=es_ES.UTF-8 LC_ALL=es_ES.UTF-8 \
-    XDG_DATA_HOME="/var/lib/tryton/.local/share" \
-    TRYTON_HOME="/var/lib/tryton"
+    XDG_DATA_HOME="/var/lib/trytond/.local/share" \
+    TRYTON_HOME="/var/lib/trytond"
 
 
 RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \

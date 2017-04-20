@@ -10,23 +10,26 @@ RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
   && echo $LANG UTF-8 >> /etc/locale.gen \
   && locale-gen  \
-  && apt-get install -y --no-install-recommends dash python-pip \
-  python-pil python-dev python-virtualenv virtualenv libyaml-dev freetds-dev \
-  libldap2-dev libsasl2-dev libpq-dev libmariadbd-dev libmysqlclient-dev sqlite sqlite3 \
-  libsqlite3-dev libmagic-dev python-uno libreoffice-writer \
+  && apt-get install -y --no-install-recommends dash libyaml-dev freetds-dev \
+  libldap2-dev libsasl2-dev libpq-dev \
+  libmariadb-client-lgpl-dev-compat libmariadb-client-lgpl-dev libmariadbd-dev libmysqlclient-dev \
+  sqlite sqlite3 libsqlite3-dev libmagic-dev libreoffice-writer \
   npm libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \
   gcc libffi-dev libncurses5-dev ttf-mscorefonts-installer rabbitmq-server \
   && ln -s /usr/bin/nodejs /usr/bin/node \
   && npm install -g grunt bower \
   && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* || true 
 
+RUN apt-get install -y --no-install-recommends python-pip  python-uno \
+    python-support python-cairo python-pil python-dev python-virtualenv virtualenv \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* || true 
+    
 WORKDIR /app
 COPY bashrc /root/.bashrc
 COPY unoconv /usr/local/bin
 
 
 ENV TRYTON_VERSION=4.0 \
-#dev/production
     ENVIRONMENT="dev" \
     PYTHON_BIN="/app/.env/bin/python" \    
     TRYTOND_BIN="trytond/bin/trytond" \

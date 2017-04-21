@@ -21,7 +21,7 @@ RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   && npm install -g grunt bower \
   && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* || true 
 
-RUN apt-get install -y --no-install-recommends python-pip  python-uno python-stdnum \
+RUN apt-get update && apt-get install -y --no-install-recommends python-pip  python-uno python-stdnum \
     python-support python-cairo python-pil python-dev python-virtualenv virtualenv \
     && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* || true 
     

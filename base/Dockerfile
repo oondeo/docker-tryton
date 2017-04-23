@@ -5,7 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive LANG=es_ES.UTF-8 LANGUAGE=es_ES.UTF-8 LC_ALL=
 
 
 RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
-  && useradd -b $TRYTON_HOME tryton   && mkdir -p $XDG_DATA_HOME $HOME && chown -R tryton $TRYTON_HOME $XDG_DATA_HOME \
+  && wget -O - https://deb.nodesource.com/setup_6.x | bash - \
+  && useradd -d $TRYTON_HOME tryton   && mkdir -p $XDG_DATA_HOME $HOME && chown -R tryton $TRYTON_HOME $XDG_DATA_HOME \
   && apt-get update  && apt-get install -y --no-install-recommends locales \
   && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
   && echo $LANG UTF-8 >> /etc/locale.gen \
@@ -13,9 +14,9 @@ RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   && apt-get install -y --no-install-recommends dash libyaml-dev freetds-dev \
   libldap2-dev libsasl2-dev libpq-dev \
   libmariadb-client-lgpl-dev-compat libmariadb-client-lgpl-dev libmariadbd-dev \
-  sqlite sqlite3 libsqlite3-dev libmagic-dev libreoffice-writer \
-  npm libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \
-  gcc libffi-dev libncurses5-dev ttf-mscorefonts-installer rabbitmq-server \
+  sqlite sqlite3 libsqlite3-dev libmagic-dev libreoffice-writer openssh-server \
+  libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \
+  nodejs gcc libffi-dev libncurses5-dev ttf-mscorefonts-installer rabbitmq-server \
   && ln -s /usr/bin/mariadb_config /usr/bin/mysql_config \
   && ln -s /usr/bin/nodejs /usr/bin/node \
   && npm install -g grunt bower \

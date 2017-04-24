@@ -7,31 +7,26 @@ ENV DEBIAN_FRONTEND=noninteractive LANG=es_ES.UTF-8 LANGUAGE=es_ES.UTF-8 LC_ALL=
 RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   && useradd -d $TRYTON_HOME tryton   && mkdir -p $XDG_DATA_HOME $TRYTON_HOME/.ssh /var/run/sshd  \
   && chown -R tryton $TRYTON_HOME $XDG_DATA_HOME \
-  && apt-get update  && apt-get install -y --no-install-recommends locales \
+  && apt-get update  && apt-get install -y --no-install-recommends locales ca-certificates wget \
+  && wget -O - https://deb.nodesource.com/setup_6.x | bash - \  
   && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
   && echo $LANG UTF-8 >> /etc/locale.gen \
   && locale-gen  \
   && apt-get install -y --no-install-recommends dash libyaml-dev freetds-dev \
-  libldap2-dev libsasl2-dev libpq-dev autoconf libtool \
+  libldap2-dev libsasl2-dev libpq-dev autoconf libtool automake \
   libmariadb-client-lgpl-dev-compat libmariadb-client-lgpl-dev libmariadbd-dev \
-  sqlite sqlite3 libsqlite3-dev libmagic-dev openssh-server \
+  sqlite sqlite3 libsqlite3-dev libmagic-dev openssh-server nodejs \
   libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \
   gcc libffi-dev libncurses5-dev ttf-mscorefonts-installer rabbitmq-server \
-  && wget -O - https://deb.nodesource.com/setup_6.x | bash - && apt-get install -y --no-install-recommends nodejs \
   && ln -s /usr/bin/mariadb_config /usr/bin/mysql_config \
   && ln -s /usr/bin/nodejs /usr/bin/node \
   && npm install -g grunt bower gulp yarn \
   && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
-RUN apt-get update && apt-get install -y --no-install-recommends libreoffice-writer python-uno python-stdnum \
-    python-support python-cairo python-pil python-dev python-virtualenv virtualenv python-pip \
-    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
-   
-ENV WATCHMAN_VERSION=4.7.0 
-RUN wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.tar.gz | tar -zxvf- -C /tmp \
-    && ln -s /var /usr/local/var && cd /tmp/watchman-$WATCHMAN_VERSION \
-    && ./autogen.sh && ./configure && make && make install && npm install -g nuclide \
-    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+ENV TINI_VERSION v0.14.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "-g","--"]
 
 ENV SASSC_VERSION=3.4.2 LIBSASS_VERSION=3.4.4
 RUN wget -O - https://github.com/sass/libsass/archive/$LIBSASS_VERSION.tar.gz  | tar -zvxf- -C /tmp \
@@ -40,11 +35,22 @@ RUN wget -O - https://github.com/sass/libsass/archive/$LIBSASS_VERSION.tar.gz  |
      && cd /tmp/sassc-$SASSC_VERSION && SASS_LIBSASS_PATH=/tmp/libsass-$LIBSASS_VERSION && make -j5 && make install \
      && cd libsass-$LIBSASS_VERSION && make install \
      && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
-    
-ENV TINI_VERSION v0.14.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
-ENTRYPOINT ["/tini", "-g","--"]
+
+ENV WATCHMAN_VERSION=4.7.0 
+RUN wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.tar.gz | tar -zxvf- -C /tmp \
+    && ln -s /var /usr/local/var && cd /tmp/watchman-$WATCHMAN_VERSION \
+    && ./autogen.sh && ./configure && make && make install && npm install -g nuclide \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+
+RUN apt-get update && apt-get install -y --no-install-recommends lldb liblldb-3.5-dev \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+
+RUN apt-get update && apt-get install -y --no-install-recommends python-uno python-stdnum \
+    python-support python-cairo python-pil python-dev python-virtualenv virtualenv python-pip \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+
+RUN apt-get update && apt-get install -y --no-install-recommends libreoffice-writer \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
 WORKDIR /app
 COPY bashrc /root/.bashrc

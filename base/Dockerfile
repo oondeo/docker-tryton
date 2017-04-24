@@ -12,20 +12,38 @@ RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   && echo $LANG UTF-8 >> /etc/locale.gen \
   && locale-gen  \
   && apt-get install -y --no-install-recommends dash libyaml-dev freetds-dev \
-  libldap2-dev libsasl2-dev libpq-dev \
+  libldap2-dev libsasl2-dev libpq-dev autoconf libtool \
   libmariadb-client-lgpl-dev-compat libmariadb-client-lgpl-dev libmariadbd-dev \
   sqlite sqlite3 libsqlite3-dev libmagic-dev libreoffice-writer openssh-server \
   libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \
   nodejs gcc libffi-dev libncurses5-dev ttf-mscorefonts-installer rabbitmq-server \
   && ln -s /usr/bin/mariadb_config /usr/bin/mysql_config \
   && ln -s /usr/bin/nodejs /usr/bin/node \
-  && npm install -g grunt bower \
-  && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* || true 
+  && npm install -g grunt bower gulp yarn \
+  && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
 RUN apt-get update && apt-get install -y --no-install-recommends python-pip  python-uno python-stdnum \
     python-support python-cairo python-pil python-dev python-virtualenv virtualenv \
-    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* || true 
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+   
+ENV WATCHMAN_VERSION=4.7.0 
+RUN apt-get update && apt-get install -y --no-install-recommends dash \
+    && cd /tmp && wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.tar.gz | tar -zxvf- \
+    && ln -s /var /usr/local/var && cd /tmp/$WATCHMAN_VERSION && ./autogen.sh && ./configure && make && make install \
+    && npm install -g nuclide \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+
+#ENV SASSC_VERSION=3.4.2 LIBSASS_VERSION=3.4.4
+#RUN wget -O - https://github.com/sass/sassc/archive/$SASSC_VERSION.tar.gz | tar -zvxf- \
+#    && https://github.com/sass/libsass/archive/3.4.4.tar.gz
+#    && cd sassc-$SASSC_VERSION
+#    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
     
+ENV TINI_VERSION v0.14.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "-g","--"]
+
 WORKDIR /app
 COPY bashrc /root/.bashrc
 COPY unoconv /usr/local/bin
@@ -40,7 +58,7 @@ ENV TRYTON_VERSION=4.0 \
     TRYTOND_ARGS="" \
     DB_NAME="" \
     TRYTOND_DATABASE_URI="postgresql://tryton:tryton@postgres:5432/" 
-    
-    
-CMD ["su","tryton","-p","-c", "${PYTHON_BIN} ${TRYTOND_BIN} -c ${TRYTOND_CONFIG} --logconf ${TRYTOND_LOGCONFIG} -v"]
-
+      
+#CMD ["su","tryton","-p","-c", "${PYTHON_BIN} ${TRYTOND_BIN} -c ${TRYTOND_CONFIG} --logconf ${TRYTOND_LOGCONFIG} -v"]
+USER tryton
+CMD ["/bin/dash","-c","${PYTHON_BIN} ${TRYTOND_BIN} -c ${TRYTOND_CONFIG} --logconf ${TRYTOND_LOGCONFIG} -v"]

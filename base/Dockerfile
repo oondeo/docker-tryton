@@ -18,10 +18,11 @@ RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   sqlite sqlite3 libsqlite3-dev libmagic-dev openssh-server nodejs \
   libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \
   gcc libffi-dev libncurses5-dev ttf-mscorefonts-installer rabbitmq-server \
-  && ln -s /usr/bin/mariadb_config /usr/bin/mysql_config \
-  && ln -s /usr/bin/nodejs /usr/bin/node \
   && npm install -g grunt bower gulp yarn \
   && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+
+RUN ln -s /usr/bin/mariadb_config /usr/bin/mysql_config || true
+RUN ln -s /usr/bin/nodejs /usr/bin/node || true
 
 ENV TINI_VERSION v0.14.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
@@ -31,10 +32,14 @@ ENTRYPOINT ["/tini", "-g","--"]
 ENV SASSC_VERSION=3.4.2 LIBSASS_VERSION=3.4.4
 RUN wget -O - https://github.com/sass/libsass/archive/$LIBSASS_VERSION.tar.gz  | tar -zvxf- -C /tmp \
      && wget -O - https://github.com/sass/sassc/archive/$SASSC_VERSION.tar.gz | tar -zvxf- -C /tmp \
-     && cd libsass-$LIBSASS_VERSION && autoreconf --force --install && ./configure --enable-shared --prefix=/usr/local \
+     && cd /tmp/libsass-$LIBSASS_VERSION && autoreconf --force --install && ./configure --enable-shared --prefix=/usr/local \
      && cd /tmp/sassc-$SASSC_VERSION && SASS_LIBSASS_PATH=/tmp/libsass-$LIBSASS_VERSION && make -j5 && make install \
      && cd libsass-$LIBSASS_VERSION && make install \
      && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+
+RUN apt-get update && apt-get install -y --no-install-recommends python-uno python-stdnum \
+    python-support python-cairo python-pil python-dev python-virtualenv virtualenv python-pip \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
 ENV WATCHMAN_VERSION=4.7.0 
 RUN wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.tar.gz | tar -zxvf- -C /tmp \
@@ -43,10 +48,6 @@ RUN wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.ta
     && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
 RUN apt-get update && apt-get install -y --no-install-recommends lldb liblldb-3.5-dev \
-    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
-
-RUN apt-get update && apt-get install -y --no-install-recommends python-uno python-stdnum \
-    python-support python-cairo python-pil python-dev python-virtualenv virtualenv python-pip \
     && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
 RUN apt-get update && apt-get install -y --no-install-recommends libreoffice-writer \

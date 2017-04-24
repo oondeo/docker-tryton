@@ -8,19 +8,22 @@ RUN sed -i 's/main$/main contrib non-free/g' /etc/apt/sources.list \
   && useradd -d $TRYTON_HOME tryton   && mkdir -p $XDG_DATA_HOME $TRYTON_HOME/.ssh /var/run/sshd  \
   && chown -R tryton $TRYTON_HOME $XDG_DATA_HOME \
   && apt-get update  && apt-get install -y --no-install-recommends locales ca-certificates wget \
-  && wget -O - https://deb.nodesource.com/setup_6.x | bash - \  
   && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
   && echo $LANG UTF-8 >> /etc/locale.gen \
   && locale-gen  \
   && apt-get install -y --no-install-recommends dash libyaml-dev freetds-dev \
   libldap2-dev libsasl2-dev libpq-dev autoconf libtool automake \
   libmariadb-client-lgpl-dev-compat libmariadb-client-lgpl-dev libmariadbd-dev \
-  sqlite sqlite3 libsqlite3-dev libmagic-dev openssh-server nodejs \
+  sqlite sqlite3 libsqlite3-dev libmagic-dev openssh-server \
   libxml2-dev libxslt-dev libjpeg-dev mercurial git build-essential libreadline-dev \
   gcc libffi-dev libncurses5-dev ttf-mscorefonts-installer rabbitmq-server \
-  && npm install -g grunt bower gulp yarn \
   && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
+RUN apt-get update  && wget -O - https://deb.nodesource.com/setup_6.x | bash - \  
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g grunt bower gulp yarn \
+    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
+  
 RUN ln -s /usr/bin/mariadb_config /usr/bin/mysql_config || true
 RUN ln -s /usr/bin/nodejs /usr/bin/node || true
 

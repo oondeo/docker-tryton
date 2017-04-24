@@ -28,13 +28,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends python-pip  pyt
    
 ENV WATCHMAN_VERSION=4.7.0 
 RUN apt-get update && apt-get install -y --no-install-recommends dash \
-    && cd /tmp && wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.tar.gz | tar -zxvf- \
-    && ln -s /var /usr/local/var && cd /tmp/$WATCHMAN_VERSION && ./autogen.sh && ./configure && make && make install \
-    && npm install -g nuclide \
+    && wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.tar.gz | tar -zxvf- -C /tmp \
+    && ln -s /var /usr/local/var && cd /tmp/watchman-$WATCHMAN_VERSION \
+    && ./autogen.sh && ./configure && make && make install && npm install -g nuclide \
     && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
 
+RUN mkdir -p mkdir /var/run/sshd && mkdir -p $TRYTON_HOME/.ssh
 #ENV SASSC_VERSION=3.4.2 LIBSASS_VERSION=3.4.4
-#RUN wget -O - https://github.com/sass/sassc/archive/$SASSC_VERSION.tar.gz | tar -zvxf- \
+#RUN mkdir /var/run/sshd && wget -O - https://github.com/sass/sassc/archive/$SASSC_VERSION.tar.gz | tar -zvxf- \
 #    && https://github.com/sass/libsass/archive/3.4.4.tar.gz
 #    && cd sassc-$SASSC_VERSION
 #    && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true 
@@ -47,7 +48,6 @@ ENTRYPOINT ["/tini", "-g","--"]
 WORKDIR /app
 COPY bashrc /root/.bashrc
 COPY unoconv /usr/local/bin
-
 
 ENV TRYTON_VERSION=4.0 \
     ENVIRONMENT="dev" \

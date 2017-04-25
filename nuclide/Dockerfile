@@ -10,6 +10,7 @@ RUN wget -O - https://github.com/facebook/watchman/archive/v$WATCHMAN_VERSION.ta
     && ./autogen.sh && ./configure && make && make install && npm install -g nuclide \
     && rm -rf /var/cache/apt/* /var/lib/apt/* /var/tmp/* /tmp/* /var/log/* /usr/share/doc/* /usr/share/man/* /root/.npm || true
 
+RUN echo -e "sshconfig\nsshconfig" | passwd tryton
 COPY sshconfig /usr/local/sbin/sshconfig
 COPY start.sh /start.sh
 
